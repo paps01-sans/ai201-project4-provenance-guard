@@ -100,9 +100,16 @@ writer can also naturally have the same surface pattern as generated prose.
 <!-- Write the rule in words, then give the numbers. What happens when the two
      signals disagree? -->
 
-**The rule:**
+**The rule:** The style signal converts each measure to an AI-likeness value
+between 0 and 1. Low sentence-length variation, low vocabulary variation, and
+low punctuation density increase the AI-likeness value. The combined score is
+an equal-weight average of the model signal and style signal. When the two
+signals disagree, the average pulls the result toward the unsure band instead
+of allowing either signal to make a confident decision by itself.
 
-**The numbers:**
+**The numbers:** `combined_score = (0.50 * model_score) + (0.50 * style_score)`.
+The model weight is `0.50` and the style weight is `0.50`, configured in
+`config.py`.
 
 **Where it lives:** `scoring.py::combine_signals`
 
@@ -111,11 +118,24 @@ writer can also naturally have the same surface pattern as generated prose.
 
 **A case where my two signals split, and what my rule does with it:**
 
-If the model signal is high because the writing is very predictable but the
-style signal is low because the sentences and punctuation vary, I will treat
-that disagreement as uncertainty instead of making a high-confidence AI claim.
-The exact weights and formula will be recorded here after they are chosen in
-Milestone 4.
+For example, if the model signal is `0.78` and the style signal is `0.30`, the
+combined score is `0.54`. The signals split, but the average keeps the result
+in the unsure band instead of making a high-confidence AI claim.
+
+My four calibration inputs produced these results:
+
+| Input             | Model score | Style score | Combined score |
+| ----------------- | ----------: | ----------: | -------------: |
+| clearly AI        |      0.6858 |      0.5387 |         0.6122 |
+| clearly human     |      0.6791 |      0.3798 |         0.5294 |
+| formal human      |      0.5878 |      0.4032 |         0.4955 |
+| lightly edited AI |      0.6812 |      0.3817 |         0.5314 |
+
+The clearly human input is a split case: the model score is high at `0.6791`,
+but the style score is lower at `0.3798`. The combined score of `0.5294`
+keeps it below the high-confidence AI threshold. The small gap between the
+clearly human and clearly AI combined scores is also a finding: these short
+examples are difficult for the model signal to separate.
 
 ### False-positive trace
 
@@ -218,11 +238,13 @@ $ curl -X POST http://127.0.0.1:5000/submit \
 
 ```json
 {
-  "confidence": 0.0,
-  "content_id": "3e3c70e7-7544-4c6e-8e84-275f5d7db858",
+  "combined_score": 0.5558,
+  "confidence": 0.5558,
+  "content_id": "8743f25b-ddcb-47a2-a2d5-8d72f393c8a9",
   "guess": "ai",
   "label": "Label not implemented yet.",
-  "model_score": 0.5435
+  "model_score": 0.5435,
+  "style_score": 0.5682
 }
 ```
 
@@ -236,20 +258,12 @@ $ curl -X POST http://127.0.0.1:5000/appeal \
 
 ```json
 {
-  "count": 1,
-  "entries": [
-    {
-      "combined_score": null,
-      "content_id": "3e3c70e7-7544-4c6e-8e84-275f5d7db858",
-      "creator_id": "writer-001",
-      "guess": "ai",
-      "label": null,
-      "model_score": 0.5435,
-      "status": "decided",
-      "style_score": null,
-      "timestamp": "2026-11-05T05:13:39+00:00"
-    }
-  ]
+  "error": "not_implemented",
+  "message": "POST /appeal isn't built yet — see the TODO in app.py.",
+  "you_sent": {
+    "content_id": "...",
+    "reasoning": "..."
+  }
 }
 ```
 
@@ -260,7 +274,22 @@ $ curl "http://127.0.0.1:5000/log?limit=3"
 ```
 
 ```json
-
+{
+  "count": 1,
+  "entries": [
+    {
+      "combined_score": 0.5558,
+      "content_id": "8743f25b-ddcb-47a2-a2d5-8d72f393c8a9",
+      "creator_id": "writer-004",
+      "guess": "ai",
+      "label": null,
+      "model_score": 0.5435,
+      "status": "decided",
+      "style_score": 0.5682,
+      "timestamp": "2026-11-05T15:28:48+00:00"
+    }
+  ]
+}
 ```
 
 ---

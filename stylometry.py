@@ -4,9 +4,8 @@ Signal two: the style signal. ← YOU BUILD THIS IN MILESTONE 4
 Signal one reads the text for meaning. This one measures it *as text* — the
 shape of it, without understanding a word.
 
-Three measures are stubbed below because the brief names those three. They are
-stubs, not implementations: what they compute is yours, and so is how you
-combine them.
+Three measures are implemented below because the brief names those three.
+Their normalization and combination are the design choices for this signal.
 
     sentence_length_spread   do sentences vary in length, or march in step?
     type_token_ratio         how much of the vocabulary repeats?
@@ -32,6 +31,7 @@ anything together:
 
 import re
 import statistics
+import string
 
 
 def sentences(text: str) -> list[str]:
@@ -64,8 +64,15 @@ def sentence_length_spread(text: str) -> float:
     `stdev` raises on fewer than two values. Decide what that should return
     before the attack set decides for you.
     """
-    # TODO: replace this
-    return 0.0
+    lengths = [len(words(sentence)) for sentence in sentences(text)]
+    lengths = [length for length in lengths if length > 0]
+    if len(lengths) < 2:
+        return 0.0
+
+    mean = statistics.mean(lengths)
+    if mean == 0:
+        return 0.0
+    return round(statistics.stdev(lengths) / mean, 4)
 
 
 def type_token_ratio(text: str) -> float:
@@ -80,8 +87,10 @@ def type_token_ratio(text: str) -> float:
     directly comparable on it, and if your test inputs vary a lot in length,
     that alone can look like a signal.
     """
-    # TODO: replace this
-    return 0.0
+    tokens = words(text)
+    if not tokens:
+        return 0.0
+    return round(len(set(tokens)) / len(tokens), 4)
 
 
 def punctuation_density(text: str) -> float:
@@ -94,8 +103,11 @@ def punctuation_density(text: str) -> float:
         more interesting than full stops, because they vary more between
         writers.
     """
-    # TODO: replace this
-    return 0.0
+    token_count = len(words(text))
+    if token_count == 0:
+        return 0.0
+    punctuation_count = sum(character in string.punctuation for character in text)
+    return round(punctuation_count / token_count, 4)
 
 
 # ── Combining them ───────────────────────────────────────────────────────────
@@ -122,8 +134,20 @@ def style_signal(text: str) -> float:
     you trust it. Plain and ordinary, not formal: formal prose reads as *human*
     to signal one, and it is plain writing that gets accused.
     """
-    # TODO: replace this
-    return 0.5
+    spread = sentence_length_spread(text)
+    vocabulary = type_token_ratio(text)
+    punctuation = punctuation_density(text)
+
+    low_spread_ai = 1.0 - min(spread, 1.0)
+    low_vocabulary_ai = 1.0 - vocabulary
+    low_punctuation_ai = 1.0 - min(punctuation / 0.15, 1.0)
+
+    score = (
+        0.5 * low_spread_ai
+        + 0.3 * low_vocabulary_ai
+        + 0.2 * low_punctuation_ai
+    )
+    return round(min(max(score, 0.0), 1.0), 4)
 
 
 if __name__ == "__main__":
@@ -139,4 +163,4 @@ if __name__ == "__main__":
     print(f"type_token_ratio         {type_token_ratio(text)}")
     print(f"punctuation_density      {punctuation_density(text)}")
     print(f"style_signal             {style_signal(text)}   (higher = more likely AI)")
-    print("\nAll zeros? These are stubs — Milestone 4 is where you build them.")
+    print("\nStyle signal is ready for the service.")
