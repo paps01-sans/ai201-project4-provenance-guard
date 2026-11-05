@@ -213,11 +213,17 @@ inputs, and returned result without needing to ask how the service works.
 ```bash
 $ curl -X POST http://127.0.0.1:5000/submit \
   -H "Content-Type: application/json" \
-  -d '{"text": "...", "creator_id": "..."}'
+     -d '{"text": "I walked home after class and noticed the same blue mug on the library steps. I do not know who left it there, but it made the whole afternoon feel strangely personal.", "creator_id": "writer-001"}'
 ```
 
 ```json
-
+{
+  "confidence": 0.0,
+  "content_id": "3e3c70e7-7544-4c6e-8e84-275f5d7db858",
+  "guess": "ai",
+  "label": "Label not implemented yet.",
+  "model_score": 0.5435
+}
 ```
 
 **An appeal**
@@ -229,7 +235,22 @@ $ curl -X POST http://127.0.0.1:5000/appeal \
 ```
 
 ```json
-
+{
+  "count": 1,
+  "entries": [
+    {
+      "combined_score": null,
+      "content_id": "3e3c70e7-7544-4c6e-8e84-275f5d7db858",
+      "creator_id": "writer-001",
+      "guess": "ai",
+      "label": null,
+      "model_score": 0.5435,
+      "status": "decided",
+      "style_score": null,
+      "timestamp": "2026-11-05T05:13:39+00:00"
+    }
+  ]
+}
 ```
 
 **What the log shows afterwards**
