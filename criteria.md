@@ -5,14 +5,14 @@ Five criteria that say what "working" means for this service, written in unit 7
 
 **All five are yours.** None are given.
 
-An acceptance criterion names a number or something plainly observable. *"The
-detector is accurate"* is an opinion — and perfect AI detection isn't possible
-anyway, so it's an opinion about something nobody can deliver. *"Of 10 pieces I
-wrote myself, at most 1 is labelled high-confidence AI"* is a criterion.
+An acceptance criterion names a number or something plainly observable. _"The
+detector is accurate"_ is an opinion — and perfect AI detection isn't possible
+anyway, so it's an opinion about something nobody can deliver. _"Of 10 pieces I
+wrote myself, at most 1 is labelled high-confidence AI"_ is a criterion.
 
-Under each, write a sentence or two on **why that target**. *"I allow at most 1
+Under each, write a sentence or two on **why that target**. _"I allow at most 1
 false positive in 10 because on a writing site a wrong accusation costs more
-than a missed detection"* is a real answer.
+than a missed detection"_ is a real answer.
 
 > Missing your own targets next unit costs you nothing. Setting a target so
 > easy you can't miss it does.
@@ -23,13 +23,13 @@ than a missed detection"* is a real answer.
 
 **Cover at least three of these five areas.** They're prompts, not a form.
 
-| Area | A question it could answer |
-|---|---|
-| False positives | How often may a human's writing get called AI? |
-| Score spread | How far apart should clearly-AI and clearly-human text score? |
-| Label coverage | Is every one of your three labels actually reachable? |
-| The appeal path | Does an appeal always change status and always get recorded? |
-| Bad input | What happens when `text` is missing, empty, or enormous? |
+| Area            | A question it could answer                                    |
+| --------------- | ------------------------------------------------------------- |
+| False positives | How often may a human's writing get called AI?                |
+| Score spread    | How far apart should clearly-AI and clearly-human text score? |
+| Label coverage  | Is every one of your three labels actually reachable?         |
+| The appeal path | Does an appeal always change status and always get recorded?  |
+| Bad input       | What happens when `text` is missing, empty, or enormous?      |
 
 Two things worth knowing before you pick numbers:
 
@@ -42,15 +42,19 @@ Two things worth knowing before you pick numbers:
   a **miss**.
 
 ---
+
 ## 1.
 
 <!-- Your criterion. It must name a number. -->
 
-
+Across each of three evaluation runs, no more than 1 of 10 pieces of my own
+writing may receive the `high-confidence AI` label.
 
 **Why this target:**
 
-
+False accusations are more harmful than letting some AI writing pass. Allowing
+one false positive gives the detector a small margin for uncertainty while
+keeping the target meaningful for a real writing site.
 
 ---
 
@@ -58,11 +62,15 @@ Two things worth knowing before you pick numbers:
 
 <!-- Your criterion. -->
 
-
+In each of three runs, the average combined score for 5 clearly AI-written
+texts must be at least `0.65`, and the average combined score for 5 clearly
+human-written texts must be at most `0.35`.
 
 **Why this target:**
 
-
+The two averages need a gap of at least `0.30` so the scores provide useful
+separation before labels are applied. Using averages allows individual texts
+to be unusual without making the whole signal fail.
 
 ---
 
@@ -70,11 +78,15 @@ Two things worth knowing before you pick numbers:
 
 <!-- Your criterion. -->
 
-
+The three labels `human`, `unsure`, and `ai` must each be produced by at least
+one submitted text in the label-coverage scenario during every evaluation
+run.
 
 **Why this target:**
 
-
+Every label is part of the public contract. Requiring all three in all three
+runs proves that the thresholds are reachable and that the unsure option is
+not just documentation that the service never returns.
 
 ---
 
@@ -82,11 +94,15 @@ Two things worth knowing before you pick numbers:
 
 <!-- Your criterion. -->
 
-
+For 5 valid submissions followed by 5 valid appeals, every appeal must return
+an observable success response, include the original `content_id`, and create
+an audit entry with `status: "under_review"` and the submitted reasoning.
 
 **Why this target:**
 
-
+An appeal is the main protection against a wrong accusation. Requiring all 5
+appeals to be recorded makes sure the path works repeatedly and does not only
+appear to work for one example.
 
 ---
 
@@ -94,11 +110,16 @@ Two things worth knowing before you pick numbers:
 
 <!-- Your criterion. -->
 
-
+For four malformed submissions, covering missing `text`, `null` text, empty
+text, and an oversized text body, the service must return a JSON error with a
+4xx status every time, never return a 5xx response, and never write a normal
+`decided` audit entry.
 
 **Why this target:**
 
-
+Malformed input is normal for a public endpoint, and a bad request should not
+crash the service or look like a real detection decision. Four cases cover the
+main input failures without hiding which behavior needs fixing.
 
 ---
 
