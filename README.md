@@ -325,15 +325,26 @@ $ curl "http://127.0.0.1:5000/log?limit=3"
 
 **Moment 1**
 
-- _What I asked for:_
-- _What came back:_
-- _What I changed:_
+- _What I asked for:_ I asked for help tracing a submission from the API route
+  through the detector, stylometry signal, scoring rule, label, and audit log.
+- _What came back:_ The response broke the pipeline into seven steps and
+  pointed out that model predictability and text shape have different blind
+  spots.
+- _What I changed:_ I wrote the trace in my own words, kept the false-positive
+  case focused on plain human writing, and added the blind spots to the
+  Signals and Scoring section.
 
 **Moment 2**
 
-- _What I asked for:_
-- _What came back:_
-- _What I changed:_
+- _What I asked for:_ I asked for help implementing and testing the second
+  signal, combined score, reader labels, and appeal workflow without hiding
+  uncertain results.
+- _What came back:_ The response suggested testing the signal on its own,
+  using an equal-weight average, checking all three label bands, and verifying
+  an appeal with a real content id in the audit log.
+- _What I changed:_ I adjusted the sentence-spread normalization after the
+  calibration results, chose the final label wording and thresholds, tested
+  three real label outputs, and confirmed the appeal became `under_review`.
 
 <!-- ═══════════════════════ UNIT 8 — THE TEST ═══════════════════════ -->
 
