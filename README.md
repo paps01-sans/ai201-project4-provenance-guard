@@ -161,17 +161,28 @@ predictable signal as proof.
 
      Write them for someone who has never heard the word "threshold". -->
 
-| Label                 | Score range | The exact text a reader sees |
-| --------------------- | ----------- | ---------------------------- |
-| high-confidence human |             |                              |
-| unsure                |             |                              |
-| high-confidence AI    |             |                              |
+| Label                 | Score range              | The exact text a reader sees                                   |
+| --------------------- | ------------------------ | -------------------------------------------------------------- |
+| high-confidence human | 0.00 to 0.35             | We think this was probably written by a person.                |
+| unsure                | above 0.35 to below 0.65 | We are not sure whether this was written by a person or by AI. |
+| high-confidence AI    | 0.65 to 1.00             | We think this was probably written by AI.                      |
 
 **Why I worded the "unsure" one this way:**
 
 <!-- It's the hardest of the three. It has to admit uncertainty without
      sounding like an accusation, because the person reading it may well have
      written every word themselves. -->
+
+It says what the system does not know without accusing the writer. It also
+gives the writer a clear reason to use the appeal path.
+
+I reached all three labels with these submissions:
+
+| Guess    | Combined score | Reader-facing label                                            |
+| -------- | -------------: | -------------------------------------------------------------- |
+| `ai`     |         0.8899 | We think this was probably written by AI.                      |
+| `unsure` |         0.5558 | We are not sure whether this was written by a person or by AI. |
+| `human`  |         0.0874 | We think this was probably written by a person.                |
 
 ## Endpoint Contracts
 
@@ -233,16 +244,16 @@ inputs, and returned result without needing to ask how the service works.
 ```bash
 $ curl -X POST http://127.0.0.1:5000/submit \
   -H "Content-Type: application/json" \
-     -d '{"text": "I walked home after class and noticed the same blue mug on the library steps. I do not know who left it there, but it made the whole afternoon feel strangely personal.", "creator_id": "writer-001"}'
+           -d '{"text": "I walked home after class and noticed the same blue mug on the library steps. I do not know who left it there, but it made the whole afternoon feel strangely personal.", "creator_id": "milestone5-unsure"}'
 ```
 
 ```json
 {
   "combined_score": 0.5558,
   "confidence": 0.5558,
-  "content_id": "8743f25b-ddcb-47a2-a2d5-8d72f393c8a9",
-  "guess": "ai",
-  "label": "Label not implemented yet.",
+  "content_id": "6fb45c95-4274-42a0-a6f2-7a74a7b4250b",
+  "guess": "unsure",
+  "label": "We are not sure whether this was written by a person or by AI.",
   "model_score": 0.5435,
   "style_score": 0.5682
 }
@@ -253,17 +264,14 @@ $ curl -X POST http://127.0.0.1:5000/submit \
 ```bash
 $ curl -X POST http://127.0.0.1:5000/appeal \
   -H "Content-Type: application/json" \
-  -d '{"content_id": "...", "reasoning": "..."}'
+     -d '{"content_id": "6fb45c95-4274-42a0-a6f2-7a74a7b4250b", "reasoning": "I wrote this piece myself and would like a human review of the uncertain result."}'
 ```
 
 ```json
 {
-  "error": "not_implemented",
-  "message": "POST /appeal isn't built yet — see the TODO in app.py.",
-  "you_sent": {
-    "content_id": "...",
-    "reasoning": "..."
-  }
+  "content_id": "6fb45c95-4274-42a0-a6f2-7a74a7b4250b",
+  "message": "Your appeal was received and is now under review.",
+  "status": "under_review"
 }
 ```
 
@@ -275,18 +283,37 @@ $ curl "http://127.0.0.1:5000/log?limit=3"
 
 ```json
 {
-  "count": 1,
+  "count": 3,
   "entries": [
     {
       "combined_score": 0.5558,
-      "content_id": "8743f25b-ddcb-47a2-a2d5-8d72f393c8a9",
-      "creator_id": "writer-004",
-      "guess": "ai",
-      "label": null,
+      "content_id": "6fb45c95-4274-42a0-a6f2-7a74a7b4250b",
+      "creator_id": "milestone5-unsure",
+      "guess": "unsure",
+      "label": "We are not sure whether this was written by a person or by AI.",
       "model_score": 0.5435,
       "status": "decided",
       "style_score": 0.5682,
-      "timestamp": "2026-11-05T15:28:48+00:00"
+      "timestamp": "2026-11-05T15:36:18+00:00"
+    },
+    {
+      "combined_score": 0.0874,
+      "content_id": "2979c638-d85a-46b3-bf32-a88ce0afe79a",
+      "creator_id": "milestone5-human",
+      "guess": "human",
+      "label": "We think this was probably written by a person.",
+      "model_score": 0.1424,
+      "status": "decided",
+      "style_score": 0.0324,
+      "timestamp": "2026-11-05T15:36:18+00:00"
+    },
+    {
+      "content_id": "6fb45c95-4274-42a0-a6f2-7a74a7b4250b",
+      "creator_id": "milestone5-unsure",
+      "event": "appeal",
+      "reasoning": "I wrote this piece myself and would like a human review of the uncertain result.",
+      "status": "under_review",
+      "timestamp": "2026-11-05T15:36:28+00:00"
     }
   ]
 }
