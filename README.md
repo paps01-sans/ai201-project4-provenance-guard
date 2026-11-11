@@ -555,19 +555,313 @@ unsure band.
 
 <!-- Your five criteria across three trials. `run_eval.py --label before`. -->
 
-| Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
-| --------- | ------ | ----- | ----- | ----- | ------- |
-| 1.        |        |       |       |       |         |
-| 2.        |        |       |       |       |         |
-| 3.        |        |       |       |       |         |
-| 4.        |        |       |       |       |         |
-| 5.        |        |       |       |       |         |
+| Criterion                       | Target                               | Run 1                  | Run 2                  | Run 3                  | Verdict |
+| ------------------------------- | ------------------------------------ | ---------------------- | ---------------------- | ---------------------- | ------- |
+| 1. My own writing flagged as AI | <= 1 of 10                           | 1/10                   | 1/10                   | 1/10                   | MET     |
+| 2. Score spread                 | AI avg 0.65+, human avg 0.35 or less | AI 0.491 / human 0.394 | AI 0.491 / human 0.394 | AI 0.491 / human 0.394 | MISSED  |
+| 3. All three labels reachable   | 3 of 3                               | 3/3                    | 3/3                    | 3/3                    | MET     |
+| 4. Appeal changes status        | 5 of 5                               | 5/5                    | 5/5                    | 5/5                    | MET     |
+| 5. Bad input returns 4xx        | 4 of 4                               | 3/4                    | 3/4                    | 3/4                    | MISSED  |
 
 **Real output from one trial**, pasted as text, naming the file and function
 that produced it:
 
-```json
+Source: `results/run_2026-11-11_1644_before.md`, produced by
+`run_eval.py::main`. These are the Trial 1 results.
 
+### Criterion 1: my own writing
+
+```json
+[
+  {
+    "status": 200,
+    "guess": "ai",
+    "confidence": 0.6522,
+    "model_score": 0.7258,
+    "style_score": 0.5786,
+    "label": "We think this was probably written by AI."
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.4705,
+    "model_score": 0.5057,
+    "style_score": 0.4352,
+    "label": "We are not sure whether this was written by a person or by AI."
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.3644,
+    "model_score": 0.2915,
+    "style_score": 0.4373,
+    "label": "We are not sure whether this was written by a person or by AI."
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.4401,
+    "model_score": 0.5112,
+    "style_score": 0.369,
+    "label": "We are not sure whether this was written by a person or by AI."
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.4637,
+    "model_score": 0.6303,
+    "style_score": 0.297,
+    "label": "We are not sure whether this was written by a person or by AI."
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.5025,
+    "model_score": 0.4963,
+    "style_score": 0.5086,
+    "label": "We are not sure whether this was written by a person or by AI."
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.5526,
+    "model_score": 0.516,
+    "style_score": 0.5892,
+    "label": "We are not sure whether this was written by a person or by AI."
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.3663,
+    "model_score": 0.3787,
+    "style_score": 0.354,
+    "label": "We are not sure whether this was written by a person or by AI."
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.2564,
+    "model_score": 0.3275,
+    "style_score": 0.1852,
+    "label": "We think this was probably written by a person."
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.339,
+    "model_score": 0.3441,
+    "style_score": 0.3339,
+    "label": "We think this was probably written by a person."
+  }
+]
+```
+
+### Criterion 2: score spread
+
+```json
+[
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.6122,
+    "model_score": 0.6858,
+    "style_score": 0.5387,
+    "label": "We are not sure whether this was written by a person or by AI."
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.6112,
+    "model_score": 0.801,
+    "style_score": 0.4213,
+    "label": "We are not sure whether this was written by a person or by AI."
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.5066,
+    "model_score": 0.5328,
+    "style_score": 0.4804,
+    "label": "We are not sure whether this was written by a person or by AI."
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.4068,
+    "model_score": 0.5903,
+    "style_score": 0.2233,
+    "label": "We are not sure whether this was written by a person or by AI."
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.3185,
+    "model_score": 0.4928,
+    "style_score": 0.1443,
+    "label": "We think this was probably written by a person."
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.5294,
+    "model_score": 0.6791,
+    "style_score": 0.3798,
+    "label": "We are not sure whether this was written by a person or by AI."
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.1466,
+    "model_score": 0.1144,
+    "style_score": 0.1787,
+    "label": "We think this was probably written by a person."
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.5133,
+    "model_score": 0.4854,
+    "style_score": 0.5412,
+    "label": "We are not sure whether this was written by a person or by AI."
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.37,
+    "model_score": 0.5975,
+    "style_score": 0.1424,
+    "label": "We are not sure whether this was written by a person or by AI."
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.4122,
+    "model_score": 0.4412,
+    "style_score": 0.3831,
+    "label": "We are not sure whether this was written by a person or by AI."
+  }
+]
+```
+
+### Criterion 3: label coverage
+
+```json
+[
+  {
+    "status": 200,
+    "guess": "ai",
+    "confidence": 0.8899,
+    "model_score": 0.9948,
+    "style_score": 0.785,
+    "label": "We think this was probably written by AI."
+  },
+  {
+    "status": 200,
+    "guess": "human",
+    "confidence": 0.0874,
+    "model_score": 0.1424,
+    "style_score": 0.0324,
+    "label": "We think this was probably written by a person."
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.5558,
+    "model_score": 0.5435,
+    "style_score": 0.5682,
+    "label": "We are not sure whether this was written by a person or by AI."
+  }
+]
+```
+
+### Criterion 4: appeal path
+
+```json
+[
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.5766,
+    "appeal_http_status": 200,
+    "appeal_status": "under_review",
+    "appeal_message": "Your appeal was received and is now under review."
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.3726,
+    "appeal_http_status": 200,
+    "appeal_status": "under_review",
+    "appeal_message": "Your appeal was received and is now under review."
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.3614,
+    "appeal_http_status": 200,
+    "appeal_status": "under_review",
+    "appeal_message": "Your appeal was received and is now under review."
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.4708,
+    "appeal_http_status": 200,
+    "appeal_status": "under_review",
+    "appeal_message": "Your appeal was received and is now under review."
+  },
+  {
+    "status": 200,
+    "guess": "unsure",
+    "confidence": 0.5461,
+    "appeal_http_status": 200,
+    "appeal_status": "under_review",
+    "appeal_message": "Your appeal was received and is now under review."
+  }
+]
+```
+
+### Criterion 5: bad input
+
+```json
+[
+  {
+    "status": 400,
+    "guess": null,
+    "confidence": null,
+    "model_score": null,
+    "style_score": null,
+    "label": null,
+    "sent": "(empty text)"
+  },
+  {
+    "status": 400,
+    "guess": null,
+    "confidence": null,
+    "model_score": null,
+    "style_score": null,
+    "label": null,
+    "sent": "{\"creator_id\": \"eval_bad_missing\"}"
+  },
+  {
+    "status": 400,
+    "guess": null,
+    "confidence": null,
+    "model_score": null,
+    "style_score": null,
+    "label": null,
+    "sent": "{\"creator_id\": \"eval_bad_null\", \"text\": null}"
+  },
+  {
+    "status": 200,
+    "guess": "ai",
+    "confidence": 0.9988,
+    "model_score": 0.9975,
+    "style_score": 1.0,
+    "label": "We think this was probably written by AI.",
+    "sent": "word word word word word word word word word word word word word word "
+  }
+]
 ```
 
 **Diagnoses**

@@ -26,45 +26,67 @@ SCENARIOS = [
     {
         "name": "my own writing",
         "criterion": 1,
-        # ⚠️ PUT YOUR OWN WRITING HERE. Not AI text, not a sample from the web —
-        # things you actually wrote. This is the criterion that matters most and
-        # it's meaningless with someone else's prose.
         "texts": [
-            "REPLACE ME with a paragraph you wrote yourself.",
-            "REPLACE ME with another one. Ten pieces is the usual number.",
+            "I missed the bus after class and ended up walking home in the cold. It was annoying at first, but the quiet walk gave me time to think.",
+            "My roommate bought a plant and forgot to water it. I started taking care of it, and now I check the leaves before I check my phone.",
+            "The library was packed today, so I sat near the window. I finished less work than planned, but I liked watching people hurry across the quad.",
+            "I tried cooking rice without looking at the instructions. It came out too sticky, but the vegetables were good enough to make dinner work.",
+            "A friend sent me a picture from home. It made me miss my family for a minute, then we started joking about the old couch in the background.",
+            "I kept putting off a short assignment because I thought it would take forever. It took twenty minutes once I finally opened the document.",
+            "The coffee shop played the same song twice while I was studying. I noticed the second time and decided it was probably a sign to leave.",
+            "I found a coin under my desk while cleaning. It was not worth much, but finding it made the boring chore feel slightly less pointless.",
+            "The weather changed three times before lunch. I carried an umbrella, wore a jacket, and still ended up being completely wrong about what the day wanted.",
+            "I called my grandmother after dinner and listened to her explain a recipe I have never managed to make correctly. I wrote down the part about adding patience.",
+        ],
+    },
+    {
+        "name": "score spread",
+        "criterion": 2,
+        "texts": [
+            "The implementation of the proposed framework requires careful consideration of several key factors. The system should provide reliable results across a wide range of inputs and maintain consistent performance over time.",
+            "The following procedure provides a structured approach to the problem. First, the relevant information is collected. Next, the information is analyzed. Finally, the result is evaluated against the stated requirements.",
+            "Effective project management depends on clear communication, consistent planning, and careful attention to measurable outcomes. These principles support reliable execution and improve the quality of the final result.",
+            "The proposed solution offers several important benefits. It improves efficiency, reduces unnecessary complexity, and supports a consistent user experience across different operating conditions.",
+            "A successful implementation requires appropriate preparation, regular monitoring, and a willingness to make adjustments when new information becomes available. This process helps maintain stable performance.",
+            "I left my keys in the fridge again. I found them beside the mustard and laughed so hard that I forgot why I was in the kitchen.",
+            "The rain kept changing its mind. I started writing about my bus ride, then remembered the orange cat under the bakery table and forgot where the sentence was going.",
+            "My shoes were soaked before I reached the corner, and one sock started sliding under my heel. I bought a newspaper from the shop even though I do not read newspapers.",
+            "I planned to clean the whole room, but I found an old ticket under the bed and spent half an hour trying to remember the night it came from. The room stayed messy.",
+            "There was a blue mug on the library steps after class. I moved it under the roof, then worried that someone had left it there on purpose and would think I had ruined the plan.",
         ],
     },
     {
         "name": "label coverage",
-        "criterion": 2,
-        # Inputs spread across your score range, so you can check all three
-        # labels are actually reachable.
+        "criterion": 3,
         "texts": [
-            "REPLACE ME with something you're confident is AI-generated.",
-            "REPLACE ME with something you're confident is human-written.",
-            "REPLACE ME with something genuinely borderline.",
+            "The system works. " * 20,
+            "Whisper. The rain kept changing its mind, tapping the windows, stopping, then returning with a sharper rhythm; somewhere beyond the laundromat, a violinist practiced the same crooked phrase until it became beautiful. I forgot my umbrella. Ah!",
+            "I walked home after class and noticed the same blue mug on the library steps. I do not know who left it there, but it made the whole afternoon feel strangely personal.",
         ],
     },
-    # A bad-input criterion looks like this. Uncomment and adjust if that's one
-    # of your five — these are raw request bodies, sent exactly as written.
-    #
-    # {
-    #     "name": "bad input",
-    #     "criterion": 3,
-    #     "bodies": [
-    #         {"text": "", "creator_id": "eval_bad_empty"},
-    #         {"creator_id": "eval_bad_missing"},          # no text field at all
-    #         {"text": "word " * 50000, "creator_id": "eval_bad_huge"},
-    #         {"text": None, "creator_id": "eval_bad_null"},
-    #     ],
-    # },
-
-    # TODO: add what your remaining criteria need.
-    #
-    # A criterion about the appeal path can't be tested by sending text alone;
-    # it needs a submission first and then an appeal against the content_id
-    # that came back. You'll need to test that one by hand, or extend this file
-    # and run_eval.py to do it. Saying which you did is part of the write-up.
+    {
+        "name": "appeal path",
+        "criterion": 4,
+        "appeal": True,
+        "reasoning": "I wrote this piece myself and would like a human review of the result.",
+        "texts": [
+            "I made dinner late because I lost track of time. The noodles were overcooked, but I ate them anyway while watching the rain.",
+            "My notes looked clear until I tried to study from them. I think I understood the lecture, but my handwriting disagrees.",
+            "I walked past the gym and heard someone practicing the same song on a piano. They missed one note every time, which somehow made it nicer.",
+            "The printer stopped working right before I needed it. I restarted it twice, stared at the screen, and then used the computer lab instead.",
+            "I found an old receipt in my jacket and remembered the sandwich I bought that day. It was not a big memory, but it came back very clearly.",
+        ],
+    },
+    {
+        "name": "bad input",
+        "criterion": 5,
+        "bodies": [
+            {"creator_id": "eval_bad_empty", "text": ""},
+            {"creator_id": "eval_bad_missing"},
+            {"creator_id": "eval_bad_null", "text": None},
+            {"creator_id": "eval_bad_huge", "text": "word " * 50000},
+        ],
+    },
 ]
 
 

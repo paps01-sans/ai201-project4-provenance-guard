@@ -119,7 +119,7 @@ def main():
                     response = requests.post(f"{args.url}/submit", json=body,
                                              timeout=args.timeout)
                     payload = response.json() if response.content else {}
-                    results.append({
+                    result = {
                         "status": response.status_code,
                         "guess": payload.get("guess"),
                         "confidence": payload.get("confidence"),
@@ -127,7 +127,31 @@ def main():
                         "style_score": payload.get("style_score"),
                         "label": payload.get("label"),
                         "sent": preview,
-                    })
+                    }
+                    if scenario.get("appeal") and response.status_code == 200:
+                        appeal_response = requests.post(
+                            f"{args.url}/appeal",
+                            json={
+                                "content_id": payload.get("content_id"),
+                                "reasoning": scenario.get(
+                                    "reasoning",
+                                    "I wrote this piece myself and would like a review.",
+                                ),
+                            },
+                            timeout=args.timeout,
+                        )
+                        appeal_payload = (
+                            appeal_response.json()
+                            if appeal_response.content
+                            else {}
+                        )
+                        result.update({
+                            "appeal_http_status": appeal_response.status_code,
+                            "appeal_content_id": appeal_payload.get("content_id"),
+                            "appeal_status": appeal_payload.get("status"),
+                            "appeal_message": appeal_payload.get("message"),
+                        })
+                    results.append(result)
                 except Exception as exc:  # noqa: BLE001
                     results.append({"status": None, "error": f"{type(exc).__name__}: {exc}",
                                     "sent": preview})
