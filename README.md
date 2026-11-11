@@ -880,6 +880,65 @@ Source: `results/run_2026-11-11_1644_before.md`, produced by
 
      Look for a pattern. Five failures on one signal is one problem, not five. -->
 
+### Criterion 2: score spread, MISSED
+
+The stage is mainly signal one, with help from the combining rule. The clearly
+AI texts averaged only `0.491`, below my `0.65` target, while the clearly human
+texts averaged `0.394`, above my `0.35` target. The model signal gave several
+human examples fairly high predictability scores, and the style signal also
+gave some AI examples low AI-likeness scores. Since the combining rule gives
+both signals equal weight, those overlapping scores stayed in the unsure band
+instead of separating the two groups. The target was measurable, so I am not
+revising it just because the system missed it.
+
+### Criterion 5: bad input, MISSED
+
+The stage is the route. Three of the four bad-input cases returned 400, but the
+oversized `word ` body returned 200 and received an AI label. The route checks
+that `text` is a non-empty string but has no maximum length check. The detector
+then truncates the huge input to its token window and scores it like normal
+content. The mechanism is missing input-size validation, not a threshold
+problem. The target was clear, so I am keeping the original criterion.
+
+### Broken attack patterns
+
+The evasion failures were mostly signal two: EV02, EV03, EV06, EV07, and EV09
+changed sentence shape, quotations, or punctuation so the style score moved
+the AI text into the unsure band. The stage is signal two, and the mechanism is
+that surface edits change sentence spread or punctuation without changing
+authorship. EV04 and EV08 reached signal one: unusual words raised perplexity
+and text below the token window changed what the model saw, so the model score
+dropped. The stage is signal one, and the mechanism is that predictability is
+not the same as authorship. EV05 fooled both signals with heavy editing and
+was labeled human, so its stages are signal one and signal two together.
+EV01 never returned a JSON response and timed out, so its stage is the route
+around the detector call. The mechanism was a request that did not complete,
+which is a service failure before labeling.
+
+FP03 and FP05 were the two false positives. They reached the label mapping
+with scores just above `0.65`, but the main stage was signal one: careful
+formal or technical human writing was predictable to the local model. The
+equal-weight combining rule kept the score above the AI threshold instead of
+letting the style signal move it into unsure. This is the most important human
+impact because the system accused real writers.
+
+MF02 was a route failure because a one-character string reached
+`detector.perplexity`, which raised `ValueError` instead of returning a JSON
+400 response. MF03 and MF04 were also route validation failures because
+control characters and punctuation-only text passed the non-empty-string check
+and were scored as submissions. MF05, MF06, MF07, and MF08 show the same
+missing-boundary problem for a long word, emoji, right-to-left text, and a
+60,000-character body. The route accepted them, then the signals interpreted
+them as text and produced confident scores. The attack mechanism is missing
+content and size validation before signal one and signal two run.
+
+FL01_01 through FL01_10 broke because the limiter allows the configured burst
+of 10 requests per minute. FL01_11 and FL01_12 were held with 429. The stage
+is the rate-limit layer, and the mechanism is that the chosen limit stops the
+attack only after ten submissions, so the first half of the 20-request attack
+still gets through. All prompt-injection attacks were held because the route
+treats their instructions as ordinary text and never executes them.
+
 ---
 
 ## The Improvement
