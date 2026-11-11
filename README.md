@@ -346,6 +346,16 @@ $ curl "http://127.0.0.1:5000/log?limit=3"
   calibration results, chose the final label wording and thresholds, tested
   three real label outputs, and confirmed the appeal became `under_review`.
 
+**Moment 3**
+
+- _What I asked for:_ I asked for help choosing one improvement from the attack
+  diagnoses and measuring it without changing the other parts of the service.
+- _What came back:_ The response focused on route validation because the first
+  run had a short-input crash and accepted a very large body.
+- _What I changed:_ I added the 3-word and 10,000-character limits, reran the
+  full attack set and all five criteria, and recorded that malformed failures
+  dropped from 7 to 3 while the other weaknesses stayed the same.
+
 <!-- ═══════════════════════ UNIT 8 — THE TEST ═══════════════════════ -->
 
 ---
@@ -984,13 +994,48 @@ because I did not change those stages.
 <!-- For each attack still getting through and each criterion still missed:
      what you'd do, and why you stopped. -->
 
+EV01 through EV09 are still broken evasion cases. EV01, EV02, EV03, EV06,
+EV07, and EV09 mainly get through signal two because typos, sentence breaks,
+quotes, punctuation, and added human text change the surface statistics. I
+would replace the simple style measures with features that are less easy to
+change, or add a semantic signal. EV04 and EV08 still get through signal one
+because unusual words and the token window change the model's predictability;
+I would calibrate the detector on longer examples and test more than one model.
+I stopped because both fixes would be a second improvement and would need a new
+calibration run.
+
+FP03 and FP05 are still false positives. Signal one gives careful non-native
+English writing and technical writing high predictability scores, and the
+combining rule leaves the scores just above the AI threshold. I would lower the
+model weight or widen the unsure band, but I stopped because that could let
+more AI writing pass and I did not want to mix a scoring change with the input
+validation experiment.
+
+MF03, MF04, and MF07 still pass the route because they contain enough
+characters or whitespace for the new boundary, even though they are control
+characters, punctuation-only text, or right-to-left text with no normal words.
+I would reject text with no tokens from `stylometry.words()` and add an
+explicit policy for unsupported characters. I stopped after fixing the crash
+and oversized-body cases because the milestone asks for one measured change.
+
+FL01_01 through FL01_10 still get 200 before the limiter returns 429 on
+FL01_11 and FL01_12. I would lower the per-minute limit or add a shorter burst
+limit, but that would make normal correction and resubmission harder for real
+writers, so I left the chosen 10-per-minute trade unchanged.
+
+Criterion 2 is still MISSED. The AI average stayed at `0.491` instead of
+`0.65`, and the human average stayed at `0.394` instead of at most `0.35` in
+all three trials. I would collect a better calibration set and retune the
+signal weights, but I stopped because the one input-validation change already
+had a measurable result and changing scoring now would make the comparison less
+clear.
+
 **The trade I'd make if this ran for real:**
 
-The remaining problems are mostly signal weaknesses: edited AI text can still
-land in the unsure or human bands, and predictable human writing can still be
-called AI. I would next widen the unsure band to reduce false accusations, even
-though that would let more AI text pass and would make the score-spread target
-harder to meet.
+I would widen the unsure band to reduce false accusations, even though edited
+AI text would get through more often. Real writers would pay less of the cost
+of detector mistakes, while the site would pay by accepting more uncertain AI
+submissions.
 
 <!-- Two sentences. Fewer wrong accusations means more AI text getting through.
      Say which way you'd go and WHO PAYS FOR IT. -->
