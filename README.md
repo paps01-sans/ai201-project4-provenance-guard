@@ -943,15 +943,36 @@ treats their instructions as ordinary text and never executes them.
 
 ## The Improvement
 
-**What I changed:**
+**What I changed:** I added one route-level input validation check in
+`app.py::submit`. Text with fewer than 3 words or more than 10,000 characters
+now returns a JSON 400 and is logged as a rejection before either signal runs.
 
-**Which diagnosis pointed at it:**
+**Which diagnosis pointed at it:** The malformed-input diagnosis showed that a
+one-character request crashed inside signal one and a 60,000-character request
+was accepted as a normal decision. I changed the route because the failure was
+input validation, not scoring.
 
 ### Attack Run — After
 
 <!-- Same format. `run_attacks.py --label after` -->
 
-**Did it help, and how do I know:**
+The full after report is [results/attack_run_2026-11-11_1748_after.md](results/attack_run_2026-11-11_1748_after.md).
+The after criteria report is [results/run_2026-11-11_1749_after.md](results/run_2026-11-11_1749_after.md).
+
+| Measurement                   |          Before |           After |
+| ----------------------------- | --------------: | --------------: |
+| Auto-marked attack crashes    |               2 |               0 |
+| Broken attacks                |              28 |              24 |
+| Held attacks                  |              28 |              32 |
+| Broken malformed attacks      |               7 |               3 |
+| Criterion 5 bad-input verdict |     MISSED, 3/4 |        MET, 4/4 |
+| Other criteria                | 3 MET, 2 MISSED | 3 MET, 2 MISSED |
+
+**Did it help, and how do I know:** Yes. The change stopped the short-input
+crash, rejected oversized input, reduced broken attacks by 4, and moved
+criterion 5 from 3/4 to 4/4 in all three trials. It did not improve the
+evasion, false-positive, score-spread, or flood results, which is expected
+because I did not change those stages.
 
 <!-- Widening the unsure band usually fixes one problem and creates another.
      Reporting that trade honestly is worth full credit. -->
@@ -964,6 +985,12 @@ treats their instructions as ordinary text and never executes them.
      what you'd do, and why you stopped. -->
 
 **The trade I'd make if this ran for real:**
+
+The remaining problems are mostly signal weaknesses: edited AI text can still
+land in the unsure or human bands, and predictable human writing can still be
+called AI. I would next widen the unsure band to reduce false accusations, even
+though that would let more AI text pass and would make the score-spread target
+harder to meet.
 
 <!-- Two sentences. Fewer wrong accusations means more AI text getting through.
      Say which way you'd go and WHO PAYS FOR IT. -->

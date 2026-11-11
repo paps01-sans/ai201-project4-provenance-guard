@@ -220,6 +220,14 @@ def submit():
         audit.log_rejection(creator_id="unknown", reason="invalid_creator_id")
         return jsonify({"error": "creator_id must be a non-empty string"}), 400
 
+    word_count = len(text.split())
+    if word_count < 3 or len(text) > 10000:
+        reason = "text_too_short" if word_count < 3 else "text_too_large"
+        audit.log_rejection(creator_id=creator_id, reason=reason)
+        return jsonify({
+            "error": "text must contain at least 3 words and be at most 10000 characters"
+        }), 400
+
     content_id = str(uuid.uuid4())
     model_score = detector.model_signal(text)
     style_score = stylometry.style_signal(text)
