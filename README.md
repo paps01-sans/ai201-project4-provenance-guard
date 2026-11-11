@@ -425,16 +425,129 @@ the active limit.
 <!-- Every attack with its outcome and a held-or-broke mark.
      `run_attacks.py --label before` produces the table. -->
 
+The full first-pass report is [results/attack_run_2026-11-11_1627.md](results/attack_run_2026-11-11_1627.md).
+I marked 28 attacks HELD and 28 BROKE. The broken cases were 9 evasion
+attacks, 2 false positives, 7 malformed inputs, and 10 flood requests. All 6
+prompt-injection attacks were HELD because the text was treated as content,
+not as instructions to the service.
+
 **Ten audit log entries from the run**
 
 <!-- Choose entries that show the interesting failures, not the ten easiest. -->
 
 ```json
-
+[
+  {
+    "timestamp": "2026-11-11T21:27:13+00:00",
+    "content_id": "24bb523a-bbf1-4440-8b50-3a4e2e33437b",
+    "creator_id": "attacker_EV05",
+    "guess": "human",
+    "model_score": 0.3212,
+    "style_score": 0.2319,
+    "combined_score": 0.2765,
+    "label": "We think this was probably written by a person.",
+    "status": "decided"
+  },
+  {
+    "timestamp": "2026-11-11T21:27:18+00:00",
+    "content_id": "3dfbe575-9526-4050-9af2-6f9de4f6cd64",
+    "creator_id": "attacker_FP03",
+    "guess": "ai",
+    "model_score": 0.8051,
+    "style_score": 0.5066,
+    "combined_score": 0.6559,
+    "label": "We think this was probably written by AI.",
+    "status": "decided"
+  },
+  {
+    "timestamp": "2026-11-11T21:27:19+00:00",
+    "content_id": "a09b7e1b-cd78-4d19-910e-d06d8340aa05",
+    "creator_id": "attacker_FP05",
+    "guess": "ai",
+    "model_score": 0.8005,
+    "style_score": 0.5144,
+    "combined_score": 0.6574,
+    "label": "We think this was probably written by AI.",
+    "status": "decided"
+  },
+  {
+    "timestamp": "2026-11-11T21:27:32+00:00",
+    "content_id": "c2537941-3d18-4b65-beaa-1d70298f87b2",
+    "creator_id": "attacker_MF06",
+    "guess": "ai",
+    "model_score": 0.9969,
+    "style_score": 1.0,
+    "combined_score": 0.9985,
+    "label": "We think this was probably written by AI.",
+    "status": "decided"
+  },
+  {
+    "timestamp": "2026-11-11T21:27:35+00:00",
+    "content_id": "494831f2-fb61-4b3a-a056-00e3938733c2",
+    "creator_id": "attacker_MF08",
+    "guess": "ai",
+    "model_score": 0.9876,
+    "style_score": 0.6545,
+    "combined_score": 0.8211,
+    "label": "We think this was probably written by AI.",
+    "status": "decided"
+  },
+  {
+    "timestamp": "2026-11-11T21:27:36+00:00",
+    "content_id": "1384e6b5-1a9f-47e1-9c60-bd829d1c015d",
+    "creator_id": "attacker_flood",
+    "guess": "human",
+    "model_score": 0.0287,
+    "style_score": 0.5519,
+    "combined_score": 0.2903,
+    "label": "We think this was probably written by a person.",
+    "status": "decided"
+  },
+  {
+    "timestamp": "2026-11-11T21:27:40+00:00",
+    "content_id": "4d347872-f695-4662-bfd2-5fcc72a9ac5e",
+    "creator_id": "attacker_flood",
+    "guess": "human",
+    "model_score": 0.0287,
+    "style_score": 0.5519,
+    "combined_score": 0.2903,
+    "label": "We think this was probably written by a person.",
+    "status": "decided"
+  },
+  {
+    "timestamp": "2026-11-11T21:27:40+00:00",
+    "creator_id": "attacker_flood",
+    "event": "rejected",
+    "status": "rejected",
+    "reason": "rate_limited",
+    "limit": "10 per 1 minute"
+  },
+  {
+    "timestamp": "2026-11-11T21:27:35+00:00",
+    "creator_id": "attacker_RQ01",
+    "event": "rejected",
+    "status": "rejected",
+    "reason": "invalid_text"
+  },
+  {
+    "timestamp": "2026-11-11T21:27:36+00:00",
+    "creator_id": "unknown",
+    "event": "rejected",
+    "status": "rejected",
+    "reason": "invalid_json_object"
+  }
+]
 ```
 
-**The single worst outcome** — the one I'd least want to explain to a writer
-whose work got caught by it:
+**The single worst outcome**
+
+FP03 is the outcome I would least want to explain to a writer. The attack set
+describes it as careful writing by a non-native English speaker, but the
+service returned `ai` with a combined score of `0.6559`, just over the `0.65`
+threshold. The model score was `0.8051`, so the main failure is signal one
+mistaking predictable careful language for evidence of AI authorship. The
+equal-weight rule then preserved that accusation instead of moving it into the
+unsure band.
 
 ---
 
