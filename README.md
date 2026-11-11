@@ -352,9 +352,14 @@ $ curl "http://127.0.0.1:5000/log?limit=3"
 
 ## Rate Limiting
 
-**My limits:** **_ per minute, _** per day
+**My limits:** 10 per minute, 200 per day
 
 **Why those numbers and not others:**
+
+Ten submissions per minute gives a real writer enough room to correct or
+resubmit work without waiting, while stopping a script from rapidly mapping
+the score thresholds. Two hundred per day supports normal writing activity but
+puts a clear ceiling on a long automated probing run.
 
 <!-- Think about two people: a real writer submitting their own work a few
      times an hour, and a script sending a thousand variations to map your
@@ -365,12 +370,52 @@ $ curl "http://127.0.0.1:5000/log?limit=3"
 differently — one script can look like a thousand callers, and one household
 can look like one. -->
 
+Requests count per `creator_id`. If a request has no usable creator id, the
+limiter falls back to the caller's address. This is the per-creator stretch
+feature: separate writers on one address do not share a bucket, while one
+creator cannot avoid the limit by changing request details.
+
 **The run of status codes when I pushed past it:**
 
 <!-- python run_attacks.py --flood 15 -->
 
 ```
+200 200 200 200 200 200 200 200 200 200 429 429 429 429 429
+```
 
+The flood used one `creator_id`, and 5 of 15 requests were rate limited. The
+429 handler recorded each rejected request with `reason: "rate_limited"` and
+the active limit.
+
+**Recent log evidence from three normal submissions and one bad request:**
+
+```json
+{
+     "combined_score": 0.2677,
+     "content_id": "6843cb4f-757d-4b59-aa46-e5f2e2a57a13",
+     "creator_id": "milestone1-writer-0",
+     "guess": "human",
+     "label": "We think this was probably written by a person.",
+     "model_score": 0.0021,
+     "style_score": 0.5333,
+     "status": "decided",
+     "timestamp": "2026-11-11T15:13:54+00:00"
+}
+{
+     "creator_id": "flood_tester",
+     "event": "rejected",
+     "limit": "10 per 1 minute",
+     "reason": "rate_limited",
+     "status": "rejected",
+     "timestamp": "2026-11-11T15:13:36+00:00"
+}
+{
+     "creator_id": "milestone1-bad-input",
+     "event": "rejected",
+     "reason": "invalid_text",
+     "status": "rejected",
+     "timestamp": "2026-11-11T15:19:19+00:00"
+}
 ```
 
 ---
